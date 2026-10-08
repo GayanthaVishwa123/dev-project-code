@@ -16,8 +16,69 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  // State variables for dynamic data
+  int _points = 0;
+  String _name = 'Diluka';
+  final String _email = 'diluka.w@nsbm.ac.lk';
+
+  // Function to add points on FloatingActionButton click
+  void _incrementPoints() {
+    setState(() {
+      _points++;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Points Added! Total Points: $_points'),
+        duration: const Duration(seconds: 1),
+        backgroundColor: Colors.black,
+      ),
+    );
+  }
+
+  // Function to edit Name via Dialog
+  void _editNameDialog() {
+    TextEditingController nameController = TextEditingController(text: _name);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Name'),
+          content: TextField(
+            controller: nameController,
+            decoration: const InputDecoration(hintText: 'Enter new name'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+              onPressed: () {
+                if (nameController.text.trim().isNotEmpty) {
+                  setState(() {
+                    _name = nameController.text;
+                  });
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('Save', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,23 +143,40 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Name',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Diluka',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
+                  // Name Section with Interactive Edit Button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Name',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.edit, size: 20, color: Colors.black),
+                        onPressed: _editNameDialog,
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 20),
+
+                  // Email Section
                   const Text(
                     'Email',
                     style: TextStyle(
@@ -109,12 +187,12 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Row(
-                    children: const [
-                      Icon(Icons.email, size: 20, color: Colors.black),
-                      SizedBox(width: 10),
+                    children: [
+                      const Icon(Icons.email, size: 20, color: Colors.black),
+                      const SizedBox(width: 10),
                       Text(
-                        'diluka.w@nsbm.ac.lk',
-                        style: TextStyle(
+                        _email,
+                        style: const TextStyle(
                           fontSize: 16,
                           color: Colors.black87,
                         ),
@@ -122,6 +200,8 @@ class ProfileScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 20),
+
+                  // Dynamic Points Section
                   const Text(
                     'Points',
                     style: TextStyle(
@@ -132,13 +212,14 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Row(
-                    children: const [
-                      Icon(Icons.star, size: 20, color: Colors.black),
-                      SizedBox(width: 8),
+                    children: [
+                      const Icon(Icons.star, size: 20, color: Colors.black),
+                      const SizedBox(width: 8),
                       Text(
-                        '0',
-                        style: TextStyle(
+                        '$_points',
+                        style: const TextStyle(
                           fontSize: 16,
+                          fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
                       ),
@@ -150,8 +231,9 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
       ),
+      // Functional Floating Action Button
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: _incrementPoints,
         backgroundColor: Colors.black,
         shape: const CircleBorder(),
         child: const Icon(Icons.add, color: Colors.white),
